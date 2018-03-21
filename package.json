@@ -1,0 +1,24 @@
+{
+  "name": "svg-to-geojson",
+  "version": "0.0.0",
+  "description": "Upload SVG, return GeoJSON.",
+  "main": "index.js",
+  "dependencies": {
+    "lodash": "^4.17.5",
+    "mapbox-gl": "^0.44.1",
+    "pathologist": "^0.1.9",
+    "react": "^16.2.0",
+    "react-dnd": "^2.5.4",
+    "react-dnd-html5-backend": "^2.5.4",
+    "react-dom": "^16.2.0"
+  },
+  "devDependencies": {
+    "react-scripts": "^1.1.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build"
+  },
+  "author": "tristen",
+  "license": "ISC"
+}
