@@ -3,7 +3,7 @@ import HTML5Backend from 'react-dnd-html5-backend';
 import { DragDropContext, DropTarget } from 'react-dnd';
 import { NativeTypes } from 'react-dnd-html5-backend';
 import mapboxgl from 'mapbox-gl';
-import MapboxDraw from '@mapbox/mapbox-gl-draw';
+import MapboxDraw from '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw';
 import { pathologize } from '../pathologize';
 import { pathToCoords } from '../path-to-coordinates';
 import { saveAs } from 'filesaver.js';
