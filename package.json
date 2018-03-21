@@ -2,8 +2,10 @@
   "name": "svg-to-geojson",
   "version": "0.0.0",
   "description": "Upload SVG, return GeoJSON.",
-  "main": "index.js",
+  "main": "src/index.js",
   "dependencies": {
+    "@mapbox/mapbox-gl-draw": "^1.0.6",
+    "filesaver.js": "^0.2.0",
     "lodash": "^4.17.5",
     "mapbox-gl": "^0.44.1",
     "pathologist": "^0.1.9",
@@ -19,6 +21,6 @@
     "start": "react-scripts start",
     "build": "react-scripts build"
   },
-  "author": "tristen",
+  "author": "Mapbox",
   "license": "ISC"
 }

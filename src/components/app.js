@@ -3,13 +3,15 @@ import HTML5Backend from 'react-dnd-html5-backend';
 import { DragDropContext, DropTarget } from 'react-dnd';
 import { NativeTypes } from 'react-dnd-html5-backend';
 import mapboxgl from 'mapbox-gl';
+import MapboxDraw from '@mapbox/mapbox-gl-draw';
 import { pathologize } from '../pathologize';
 import { pathToCoords } from '../path-to-coordinates';
+import { saveAs } from 'filesaver.js';
 
 mapboxgl.accessToken = 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4M29iazA2Z2gycXA4N2pmbDZmangifQ.-g_vE53SD2WrJ6tFX7QHmA';
 
 const SCALE = 1;
-const NUM_POINTS = 1000;
+const NUM_POINTS = 250;
 
 let App = class App extends React.PureComponent {
   mouseCoordinates = {
@@ -33,49 +35,22 @@ let App = class App extends React.PureComponent {
       zoom: 1.5
     });
 
+    this.draw = new MapboxDraw();
+
     this.map.on('load', () => {
-      this.map.addSource('geojson', {
-        type: 'geojson',
-        data: {
-          type: 'FeatureCollection',
-          features: []
-        }
-      });
-
-      this.map.addLayer({
-        id: 'fill',
-        type: 'fill',
-        source: 'geojson',
-        paint: {
-          'fill-color': '#027dbd',
-          'fill-opacity': 0.25
-        },
-        filter: ['==', '$type', 'Polygon']
-      });
-
-      this.map.addLayer({
-        id: 'line',
-        type: 'line',
-        source: 'geojson',
-        paint: {
-          'line-color': '#027dbd',
-          'line-width': 2
-        },
-        filter: ['==', '$type', 'Polygon']
-      });
-
-      this.map.addLayer({
-        id: 'line',
-        type: 'line',
-        source: 'geojson',
-        paint: {
-          'line-color': '#027dbd',
-          'line-width': 2
-        },
-        filter: ['==', '$type', 'LineString']
-      });
+      this.map.addControl(this.draw);
     });
   }
+
+  download = () => {
+    const blob = new Blob([
+      JSON.stringify(this.draw.getAll(), null, 2)
+    ], {
+      type: 'text/plain;charset=utf-8'
+    });
+
+    saveAs(blob, 'features.geojson');
+  };
 
   trackCoordinates = e => {
     this.mouseCoordinates = {
@@ -88,30 +63,12 @@ let App = class App extends React.PureComponent {
     this.mapContainer = el;
   };
 
-  draw = features => {
-    const geojson = {
-      type: 'FeatureCollection',
-      features
-    };
-
-    this.map.getSource('geojson').setData(geojson);
-
-    this.setState({
-      helpText: 'Drag and drop an SVG on the map.'
-    });
-  };
-
   buildFeature = coords => {
-    const feature = {
-      type: 'Feature',
-      properties: {}
-    };
-
     // If the first and last coords match it should be drawn as a polygon
     if (coords[0][0] === coords[coords.length - 1][0] &&
         coords[0][1] === coords[coords.length - 1][1]) {
 
-      feature.geometry = {
+      return {
         type: 'Polygon',
         coordinates: [
           coords.map(d => {
@@ -121,7 +78,7 @@ let App = class App extends React.PureComponent {
         ]
       };
     } else {
-      feature.geometry = {
+      return {
         type: 'LineString',
         coordinates: coords.map(d => {
           const c = this.map.unproject(d);
@@ -129,8 +86,6 @@ let App = class App extends React.PureComponent {
         })
       };
     }
-
-    return feature;
   };
 
   calculateCoords = svg => {
@@ -154,7 +109,7 @@ let App = class App extends React.PureComponent {
     }
   };
 
-  parseSVG = svgString => {
+  svgToGeoJSON = svgString => {
 
     // Create an empty container to fetch paths using the dom
     const empty = document.createElement('div');
@@ -170,7 +125,7 @@ let App = class App extends React.PureComponent {
       return;
     }
 
-    const features = Array
+    Array
       .from(paths)
       .map(path => pathToCoords(
         path,
@@ -179,9 +134,12 @@ let App = class App extends React.PureComponent {
         coordinates.x,
         coordinates.y
       ))
-      .map(this.buildFeature);
+      .map(this.buildFeature)
+      .forEach(this.draw.add);
 
-    this.draw(features);
+    this.setState({
+      helpText: 'Drag and drop an SVG on the map.'
+    });
   };
 
   onUpload = files => {
@@ -204,7 +162,7 @@ let App = class App extends React.PureComponent {
     const reader = new FileReader();
     reader.addEventListener('load', d => {
       pathologize(d.target.result)
-        .then(this.parseSVG)
+        .then(this.svgToGeoJSON)
         .catch(() => {
           this.setState({
             helpText: 'Error parsing SVG'
@@ -222,11 +180,16 @@ let App = class App extends React.PureComponent {
 
     return connectDropTarget(
       <div onMouseMove={this.trackCoordinates}>
-        {helpText && <div className="flex-parent flex-parent--end-cross flex-parent--center-main absolute top right bottom left">
-          <div className="flex-child mb24 bg-darken50 color-white z1 py12 px24 round-full txt-s txt-bold">
-            {helpText}
+        <div className="flex-parent flex-parent--end-cross flex-parent--center-main absolute top right bottom left">
+          <div className="flex-child mb24 z1 txt-s txt-bold flex-parent">
+            <div className="flex-child bg-darken75 color-white inline-block pl24 pr12 py12 round-l-full">
+              {helpText}
+            </div>
+            <button className="flex-child btn btn--purple px24 round-r-full" onClick={this.download}>
+              Download
+            </button>
           </div>
-        </div>}
+        </div>
 
         {isOver && <div className="bg-darken25 fixed left right top bottom events-none z5" />}
         <div ref={this.setMapContainer} className="absolute top right left bottom" />
