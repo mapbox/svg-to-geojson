@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "description": "Upload SVG, return GeoJSON.",
   "main": "src/index.js",
+  "homepage": "https://www.mapbox.com/svg-to-geojson",
   "dependencies": {
     "@mapbox/mapbox-gl-draw": "^1.0.6",
     "filesaver.js": "^0.2.0",
