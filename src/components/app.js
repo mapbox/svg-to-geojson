@@ -30,7 +30,7 @@ let App = class App extends React.PureComponent {
   componentDidMount() {
     this.map = new mapboxgl.Map({
       container: this.mapContainer,
-      style: 'mapbox://styles/mapbox/streets-v9',
+      style: 'mapbox://styles/mapbox/light-v9',
       center: [5, 34],
       zoom: 1.5
     });
