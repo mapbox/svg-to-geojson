@@ -163,7 +163,8 @@ let App = class App extends React.PureComponent {
     reader.addEventListener('load', d => {
       pathologize(d.target.result)
         .then(this.svgToGeoJSON)
-        .catch(() => {
+        .catch(err => {
+          console.error(err);
           this.setState({
             helpText: 'Error parsing SVG'
           });

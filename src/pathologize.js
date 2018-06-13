@@ -1,7 +1,7 @@
 import { transform } from 'pathologist';
 
 function pathologize(svg) {
-  const expression = /<(text|style|metadata)[\s\S]*?<\/(text|style|metadata)>/g;
+  const expression = /<(text|style|metadata|pattern)[\s\S]*?<\/(text|style|metadata|pattern)>/g;
   const clean = svg.replace(expression, '');
 
   return new Promise((resolve, reject) => {
