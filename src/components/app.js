@@ -222,6 +222,4 @@ const withDragDrop = DropTarget(
   })
 );
 
-App = DragDropContext(HTML5Backend)(withDragDrop(App));
-
-export { App };
+export default DragDropContext(HTML5Backend)(withDragDrop(App));

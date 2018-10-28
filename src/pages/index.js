@@ -1,6 +1,6 @@
 import React from 'react';
 import Helmet from 'react-helmet';
-import { App } from '../components/app';
+import App from '../components/app';
 
 export default class Page extends React.Component {
   render() {
