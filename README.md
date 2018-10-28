@@ -11,9 +11,7 @@ Drag and drop SVG on the map and it returns GeoJSON back to you.
     npm install
     npm start
 
-    open http://localhost:3000/
-
-Runs the app from http://localhost:3000
+Runs the app from http://localhost:8080/svg-to-geojson/
 
 ---
 
