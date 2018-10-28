@@ -1,5 +1,6 @@
 import React from 'react';
 import HTML5Backend from 'react-dnd-html5-backend';
+import SVGO from 'worker-loader!../web-workers/svgo.js';
 import { DragDropContext, DropTarget } from 'react-dnd';
 import { NativeTypes } from 'react-dnd-html5-backend';
 import mapboxgl from 'mapbox-gl';
@@ -8,6 +9,7 @@ import { pathologize } from '../pathologize';
 import { pathToCoords } from '../path-to-coordinates';
 import { saveAs } from 'filesaver.js';
 
+const svgo = new SVGO();
 mapboxgl.accessToken = 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4M29iazA2Z2gycXA4N2pmbDZmangifQ.-g_vE53SD2WrJ6tFX7QHmA';
 
 const SCALE = 1;
@@ -161,15 +163,22 @@ let App = class App extends React.PureComponent {
 
     const reader = new FileReader();
     reader.addEventListener('load', d => {
-      pathologize(d.target.result)
-        .then(this.svgToGeoJSON)
-        .catch(err => {
-          console.error(err);
-          this.setState({
-            helpText: 'Error parsing SVG'
+
+      svgo.postMessage({
+        svg: d.target.result
+      });
+
+      svgo.addEventListener('message', e => {
+        pathologize(e.data)
+          .then(this.svgToGeoJSON)
+          .catch(err => {
+            console.error(err);
+            this.setState({
+              helpText: 'Error parsing SVG'
+            });
+            return;
           });
-          return;
-        });
+      });
     });
 
     reader.readAsText(file);
