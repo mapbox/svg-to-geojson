@@ -5,22 +5,24 @@
   "main": "src/index.js",
   "homepage": "https://www.mapbox.com/svg-to-geojson",
   "dependencies": {
+    "@mapbox/batfish": "^1.9.5",
     "@mapbox/mapbox-gl-draw": "^1.0.6",
+    "@mapbox/mbx-assembly": "^0.28.1",
     "filesaver.js": "^0.2.0",
     "lodash": "^4.17.5",
     "mapbox-gl": "^0.44.1",
     "pathologist": "^0.1.9",
-    "react": "^16.2.0",
+    "react": "^16.6.0",
     "react-dnd": "^2.5.4",
     "react-dnd-html5-backend": "^2.5.4",
-    "react-dom": "^16.2.0"
-  },
-  "devDependencies": {
-    "react-scripts": "^1.1.1"
+    "react-dom": "^16.6.0",
+    "react-helmet": "^5.2.0",
+    "worker-loader": "^2.0.0"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build"
+    "start": "batfish start",
+    "build": "batfish build",
+    "serve-static": "batfish serve-static"
   },
   "author": "Mapbox",
   "license": "ISC"
