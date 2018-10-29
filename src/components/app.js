@@ -67,25 +67,21 @@ let App = class App extends React.PureComponent {
 
   buildFeature = coords => {
     // If the first and last coords match it should be drawn as a polygon
+    const coordinates = coords.map(d => {
+      const c = this.map.unproject(d);
+      return [c.lng, c.lat];
+    });
+
     if (coords[0][0] === coords[coords.length - 1][0] &&
         coords[0][1] === coords[coords.length - 1][1]) {
-
       return {
         type: 'Polygon',
-        coordinates: [
-          coords.map(d => {
-            const c = this.map.unproject(d);
-            return [c.lng, c.lat];
-          })
-        ]
+        coordinates: [coordinates]
       };
     } else {
       return {
         type: 'LineString',
-        coordinates: coords.map(d => {
-          const c = this.map.unproject(d);
-          return [c.lng, c.lat];
-        })
+        coordinates
       };
     }
   };

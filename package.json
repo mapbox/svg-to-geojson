@@ -1,7 +1,7 @@
 {
   "name": "svg-to-geojson",
   "version": "0.0.0",
-  "description": "Upload SVG, return GeoJSON.",
+  "description": "Pass SVG, return GeoJSON.",
   "main": "src/index.js",
   "bin": {
     "svg2geojson": "bin/index.js"
@@ -11,6 +11,7 @@
     "@mapbox/batfish": "^1.9.5",
     "@mapbox/mapbox-gl-draw": "^1.0.6",
     "@mapbox/mbx-assembly": "^0.28.1",
+    "@mapbox/point-geometry": "^0.1.0",
     "filesaver.js": "^0.2.0",
     "lodash": "^4.17.5",
     "mapbox-gl": "^0.44.1",
@@ -20,6 +21,7 @@
     "react-dnd-html5-backend": "^2.5.4",
     "react-dom": "^16.6.0",
     "react-helmet": "^5.2.0",
+    "svg-path-properties": "^0.4.5",
     "worker-loader": "^2.0.0"
   },
   "scripts": {
