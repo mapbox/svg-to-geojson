@@ -50,6 +50,7 @@ let App = class App extends React.PureComponent {
     ], {
       type: 'text/plain;charset=utf-8'
     });
+
     saveAs(blob, 'features.geojson');
   };
 
@@ -66,40 +67,39 @@ let App = class App extends React.PureComponent {
 
   buildFeature = data => {
     const {id, coords} = data;
+    let feature = {
+      type: 'Feature',
+      properties: {},
+      geometry: {}
+    }
+
+    if (id) {
+      feature.properties.id = id;
+    }
+
     // If the first and last coords match it should be drawn as a polygon
     if (coords[0][0] === coords[coords.length - 1][0] &&
         coords[0][1] === coords[coords.length - 1][1]) {
-
-      return {
-        type: 'Feature',
-        properties: {
-          id: id
-        },
-        geometry: {
-          type: 'Polygon',
-          coordinates: [
-            coords.map(d => {
-              const c = this.map.unproject(d);
-              return [c.lng, c.lat];
-            })
-          ]
-        }
-      }
+          feature.geometry = {
+            type: 'Polygon',
+            coordinates: [
+              coords.map(d => {
+                const c = this.map.unproject(d);
+                return [c.lng, c.lat];
+              })
+            ]
+          };
     } else {
-      return {
-        type: 'Feature',
-        properties: {
-          id: id
-        },
-        geometry: {
-          type: 'LineString',
-          coordinates: coords.map(d => {
-            const c = this.map.unproject(d);
-            return [c.lng, c.lat];
-          })
-        }
+      feature.geometry = {
+        type: 'LineString',
+        coordinates: coords.map(d => {
+          const c = this.map.unproject(d);
+          return [c.lng, c.lat];
+        })
       };
     }
+
+    return feature;
   };
 
   calculateCoords = svg => {
@@ -131,7 +131,6 @@ let App = class App extends React.PureComponent {
 
     const coordinates = this.calculateCoords(empty.querySelector('svg'));
     const paths = empty.querySelectorAll('path');
-
 
     if (!paths.length) {
       this.setState({

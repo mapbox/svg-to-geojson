@@ -17,7 +17,7 @@ import cleanupAttrs from 'svgo/plugins/cleanupAttrs';
 import inlineStyles from 'svgo/plugins/inlineStyles';
 import minifyStyles from 'svgo/plugins/minifyStyles';
 import convertStyleToAttrs from 'svgo/plugins/convertStyleToAttrs';
-import cleanupIDs from 'svgo/plugins/cleanupIDs';
+// import cleanupIDs from 'svgo/plugins/cleanupIDs';
 import removeRasterImages from 'svgo/plugins/removeRasterImages';
 import removeUselessDefs from 'svgo/plugins/removeUselessDefs';
 import cleanupNumericValues from 'svgo/plugins/cleanupNumericValues';
@@ -60,7 +60,7 @@ const pluginsData = {
   inlineStyles,
   minifyStyles,
   convertStyleToAttrs,
-  cleanupIDs,
+  // cleanupIDs,
   //prefixIds,
   removeRasterImages,
   removeUselessDefs,

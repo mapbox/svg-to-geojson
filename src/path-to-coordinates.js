@@ -3,8 +3,7 @@ import { range } from 'lodash';
 function pathToCoords(path, scale, numPoints, translateX, translateY) {
   const length = path.getTotalLength();
   const getRange = range(numPoints);
-  const id = path.id ? path.id : '';
-
+  const id = path.id ? path.id : null;
   // Always include the max value in the range.
   // This is helpful for detecting closed polygons vs lines
   getRange.push(numPoints);
