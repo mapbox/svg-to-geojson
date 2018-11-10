@@ -60,7 +60,10 @@ const pluginsData = {
   inlineStyles,
   minifyStyles,
   convertStyleToAttrs,
-  cleanupIDs,
+  /*
+  * cleanupIDs removes ids from the svg path. We want to preserve those as properties in the GeoJSON
+  */
+  // cleanupIDs,
   //prefixIds,
   removeRasterImages,
   removeUselessDefs,
