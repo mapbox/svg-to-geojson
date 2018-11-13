@@ -8,6 +8,7 @@
     "@mapbox/batfish": "^1.9.5",
     "@mapbox/mapbox-gl-draw": "^1.0.6",
     "@mapbox/mbx-assembly": "^0.28.1",
+    "@turf/turf": "^5.1.6",
     "filesaver.js": "^0.2.0",
     "lodash": "^4.17.5",
     "mapbox-gl": "^0.44.1",
