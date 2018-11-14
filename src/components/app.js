@@ -67,7 +67,7 @@ let App = class App extends React.PureComponent {
   };
 
   buildFeature = data => {
-    const {id, coords} = data;
+    const {id, coords, fill} = data;
     let feature = {
       type: 'Feature',
       properties: {},
@@ -76,6 +76,10 @@ let App = class App extends React.PureComponent {
 
     if (id) {
       feature.properties.id = id;
+    }
+
+    if (fill) {
+      feature.properties.fill = fill;
     }
 
     // If the first and last coords match it should be drawn as a polygon

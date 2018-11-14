@@ -4,6 +4,7 @@ function pathToCoords(path, scale, numPoints, translateX, translateY) {
   const length = path.getTotalLength();
   const getRange = range(numPoints);
   const id = path.id ? path.id : null;
+  const fill = path.getAttribute("fill") ? path.getAttribute("fill") : null;
   // Always include the max value in the range.
   // This is helpful for detecting closed polygons vs lines
   getRange.push(numPoints);
@@ -13,7 +14,8 @@ function pathToCoords(path, scale, numPoints, translateX, translateY) {
     coords: getRange.map(function(i) {
       const point = path.getPointAtLength(length * i / numPoints);
       return [point.x * scale + translateX, point.y * scale + translateY];
-    })
+    }),
+    fill: fill
   }
 
 
