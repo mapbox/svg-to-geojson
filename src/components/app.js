@@ -1,3 +1,4 @@
+import './styles';
 import React from 'react';
 import HTML5Backend from 'react-dnd-html5-backend';
 import SVGO from 'worker-loader!../web-workers/svgo.js';
@@ -22,7 +23,7 @@ let App = class App extends React.PureComponent {
   };
   mapContainer = null;
 
-  constructor(props: Props) {
+  constructor(props) {
     super(props);
     this.state = {
       helpText: 'Drag and drop an SVG on the map.'
@@ -41,6 +42,7 @@ let App = class App extends React.PureComponent {
 
     this.map.on('load', () => {
       this.map.addControl(this.draw);
+      this.map.resize();
     });
   }
 
