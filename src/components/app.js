@@ -1,4 +1,5 @@
-import './styles';
+import 'mapbox-gl/dist/mapbox-gl.css';
+import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
 import React from 'react';
 import HTML5Backend from 'react-dnd-html5-backend';
 import SVGO from 'worker-loader!../web-workers/svgo.js';
