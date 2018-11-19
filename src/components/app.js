@@ -43,6 +43,7 @@ let App = class App extends React.PureComponent {
 
     this.map.on('load', () => {
       this.map.addControl(this.draw);
+      // Triggers a map redraw once the component has finished mounting to ensure the rendered map fills the entire container. See: https://www.mapbox.com/help/blank-tiles/#mapbox-gl-js
       this.map.resize();
     });
   }
