@@ -5,7 +5,6 @@
   "main": "src/index.js",
   "homepage": "https://www.mapbox.com/svg-to-geojson",
   "dependencies": {
-    "@mapbox/batfish": "^1.9.5",
     "@mapbox/mapbox-gl-draw": "^1.0.6",
     "@mapbox/mbx-assembly": "^0.28.1",
     "filesaver.js": "^0.2.0",
@@ -20,10 +19,13 @@
     "worker-loader": "^2.0.0"
   },
   "scripts": {
-    "start": "batfish start",
-    "build": "batfish build",
-    "serve-static": "batfish serve-static"
+    "start": "underreact start",
+    "build": "underreact build",
+    "serve-static": "underreact serve-static"
   },
   "author": "Mapbox",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "@mapbox/underreact": "^0.3.0"
+  }
 }

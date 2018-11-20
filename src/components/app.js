@@ -1,3 +1,5 @@
+import 'mapbox-gl/dist/mapbox-gl.css';
+import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
 import React from 'react';
 import HTML5Backend from 'react-dnd-html5-backend';
 import SVGO from 'worker-loader!../web-workers/svgo.js';
@@ -22,7 +24,7 @@ let App = class App extends React.PureComponent {
   };
   mapContainer = null;
 
-  constructor(props: Props) {
+  constructor(props) {
     super(props);
     this.state = {
       helpText: 'Drag and drop an SVG on the map.'
@@ -41,6 +43,8 @@ let App = class App extends React.PureComponent {
 
     this.map.on('load', () => {
       this.map.addControl(this.draw);
+      // Triggers a map redraw once the component has finished mounting to ensure the rendered map fills the entire container. See: https://www.mapbox.com/help/blank-tiles/#mapbox-gl-js
+      this.map.resize();
     });
   }
 
