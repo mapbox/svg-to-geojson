@@ -8,13 +8,15 @@ import MapboxDraw from '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw';
 import { pathologize } from '../pathologize';
 import { pathToCoords } from '../path-to-coordinates';
 import { saveAs } from 'filesaver.js';
+import ReactSlider from 'react-slider';
 
 const turf = require('@turf/turf');
 const svgo = new SVGO();
 mapboxgl.accessToken = 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4M29iazA2Z2gycXA4N2pmbDZmangifQ.-g_vE53SD2WrJ6tFX7QHmA';
 
 const SCALE = 1;
-const NUM_POINTS = 2000;
+let NUM_POINTS = 250,
+    currentFile;
 
 let App = class App extends React.PureComponent {
   mouseCoordinates = {
@@ -55,6 +57,34 @@ let App = class App extends React.PureComponent {
     saveAs(blob, 'features.geojson');
   };
 
+  sendValue = val => {
+    NUM_POINTS = val;
+    console.log('test', NUM_POINTS)
+    if(currentFile){
+      const reader = new FileReader();
+      reader.addEventListener('load', d => {
+
+        svgo.postMessage({
+          svg: d.target.result
+        });
+
+        svgo.addEventListener('message', e => {
+          pathologize(e.data)
+            .then(this.svgToGeoJSON)
+            .catch(err => {
+              console.error(err);
+              this.setState({
+                helpText: 'Error parsing SVG'
+              });
+              return;
+            });
+        });
+      });
+
+      reader.readAsText(currentFile);
+    }
+  }
+
   trackCoordinates = e => {
     this.mouseCoordinates = {
       x: e.screenX,
@@ -68,7 +98,7 @@ let App = class App extends React.PureComponent {
 
   buildFeature = data => {
     const {path, coords} = data;
-  
+
     let feature = {
       type: 'Feature',
       properties: {},
@@ -105,23 +135,23 @@ let App = class App extends React.PureComponent {
         let splits = [];
         coords.forEach((c, idx) => {
           if(idx > 0){
-            let from = turf.point([this.map.unproject(coords[idx - 1])['lng'], this.map.unproject(coords[idx - 1])['lat']]);
-            let to = turf.point([this.map.unproject(c)['lng'], this.map.unproject(c)['lat']]);
-            let options = {units: 'miles'};
+            const from = turf.point([this.map.unproject(coords[idx - 1])['lng'], this.map.unproject(coords[idx - 1])['lat']]);
+            const to = turf.point([this.map.unproject(c)['lng'], this.map.unproject(c)['lat']]);
+            const options = {units: 'miles'};
 
-            let distance = turf.distance(from, to, options);
+            const distance = turf.distance(from, to, options);
             // get distances between points
             distances.push(distance);
           }
         });
 
-        let distAvg = distances.reduce(getSum)/distances.length;
+        const distAvg = distances.reduce(getSum)/distances.length;
         coords.forEach((c, idx) => {
           if(idx > 0){
-            let from = turf.point([this.map.unproject(coords[idx - 1])['lng'], this.map.unproject(coords[idx - 1])['lat']]);
-            let to = turf.point([this.map.unproject(c)['lng'], this.map.unproject(c)['lat']]);
-            let options = {units: 'miles'};
-            let distance = turf.distance(from, to, options);
+            const from = turf.point([this.map.unproject(coords[idx - 1])['lng'], this.map.unproject(coords[idx - 1])['lat']]);
+            const to = turf.point([this.map.unproject(c)['lng'], this.map.unproject(c)['lat']]);
+            const options = {units: 'miles'};
+            const distance = turf.distance(from, to, options);
             // if the following coordinate is ~2.5 farther away than average, it is most likely a new polygon
             if(distance > distAvg*2.5){
               splits.push(idx);
@@ -136,11 +166,11 @@ let App = class App extends React.PureComponent {
         splits.forEach((s, idx) => {
           let shape = [];
           if(idx === 0){
-            for(var i = 0; i < s; i++){
+            for(let i = 0; i < s; i++){
               shape.push([this.map.unproject(coords[i])['lng'], this.map.unproject(coords[i])['lat']]);
             }
           } else {
-            for(var i = splits[idx-1]; i < s; i++){
+            for(let i = splits[idx-1]; i < s; i++){
               shape.push([this.map.unproject(coords[i])['lng'], this.map.unproject(coords[i])['lat']]);
             }
           }
@@ -228,6 +258,7 @@ let App = class App extends React.PureComponent {
 
   onUpload = files => {
     const file = files[0];
+    currentFile = file;
     const { type } = file;
 
     this.setState({
@@ -271,17 +302,22 @@ let App = class App extends React.PureComponent {
     const { connectDropTarget, isOver } = this.props;
 
     return connectDropTarget(
-      <div onMouseMove={this.trackCoordinates}>
-        <div className="flex-parent flex-parent--end-cross flex-parent--center-main absolute top right bottom left">
-          <div className="flex-child mb24 z1 txt-s txt-bold flex-parent">
-            <div className="flex-child bg-darken75 color-white inline-block pl24 pr12 py12 round-l-full">
-              {helpText}
+      <div>
+        <ReactSlider defaultValue={250} min={250} max={3000} onAfterChange={this.sendValue.bind(this)} withBars>
+          <div className="my-handle">😎</div>
+        </ReactSlider>
+        <div onMouseMove={this.trackCoordinates}>
+          <div className="flex-parent flex-parent--end-cross flex-parent--center-main absolute top right bottom left">
+            <div className="flex-child mb24 z1 txt-s txt-bold flex-parent">
+              <div className="flex-child bg-darken75 color-white inline-block pl24 pr12 py12 round-l-full">
+                {helpText}
+              </div>
+              <button className="flex-child btn btn--purple px24 round-r-full" onClick={this.download}>
+                Download
+              </button>
             </div>
-            <button className="flex-child btn btn--purple px24 round-r-full" onClick={this.download}>
-              Download
-            </button>
           </div>
-        </div>
+      </div>
 
         {isOver && <div className="bg-darken25 fixed left right top bottom events-none z5" />}
         <div ref={this.setMapContainer} className="absolute top right left bottom" />
