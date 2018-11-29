@@ -1,6 +1,7 @@
 import { range } from 'lodash';
 
 function pathToCoords(path, scale, numPoints, translateX, translateY) {
+  console.log(path);
   const length = path.getTotalLength();
   const getRange = range(numPoints);
   // Always include the max value in the range.

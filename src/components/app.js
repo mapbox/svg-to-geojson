@@ -40,6 +40,13 @@ let App = class App extends React.PureComponent {
       zoom: 1.5
     });
 
+    let mapp = this.map;
+
+    mapp.on('click', function(e){
+      var features = mapp.queryRenderedFeatures(e.point);
+      console.log(features);
+    });
+
     this.draw = new MapboxDraw();
 
     this.map.on('load', () => {
@@ -61,6 +68,21 @@ let App = class App extends React.PureComponent {
     NUM_POINTS = val;
     console.log('test', NUM_POINTS)
     if(currentFile){
+      const tMap = this.map;
+      let currentLayers = [];
+      tMap.getStyle().layers.forEach(item => {
+        if(item.id.match(/gl-draw/g)){
+          if(currentLayers.indexOf(item.id) < 0){
+            currentLayers.push(item.id);
+            console.log(item.source);
+          }
+        }
+      });
+      currentLayers.forEach(id => {
+        tMap.removeLayer(id);
+      })
+      tMap.removeSource('mapbox-gl-draw-cold');
+      tMap.removeSource('mapbox-gl-draw-hot');
       const reader = new FileReader();
       reader.addEventListener('load', d => {
 
@@ -74,7 +96,7 @@ let App = class App extends React.PureComponent {
             .catch(err => {
               console.error(err);
               this.setState({
-                helpText: 'Error parsing SVG'
+                helpText: 'Error parsing SVG. Try increasing number of points.'
               });
               return;
             });
@@ -303,7 +325,7 @@ let App = class App extends React.PureComponent {
 
     return connectDropTarget(
       <div>
-        <ReactSlider defaultValue={250} min={250} max={3000} onAfterChange={this.sendValue.bind(this)} withBars>
+        <ReactSlider defaultValue={250} min={250} max={5000} onAfterChange={this.sendValue.bind(this)} withBars>
           <div className="my-handle">😎</div>
         </ReactSlider>
         <div onMouseMove={this.trackCoordinates}>
