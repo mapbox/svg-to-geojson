@@ -1,0 +1,39 @@
+.sliderHolder{
+  position: absolute;
+  top: 205px;
+  right: 23px;
+}
+.slider {
+  height: 200px;
+  width: 3px;
+  z-index: 1;
+  background: #5b5a5a;
+  border-radius: 5px;
+}
+.handle{
+  position: absolute;
+  z-index: 1;
+  height: 15px;
+  width: 15px;
+  margin-left: -6px;
+  background: #fff;
+  border: 1.5px solid #5b5a5a;
+  border-radius: 50%;
+}
+.handle:hover{
+  cursor: pointer;
+}
+.handle:active{
+  cursor: grab;
+}
+.pointHolder{
+  z-index: 1;
+  position: absolute;
+  text-align: center;
+  font-size: 13px;
+  background-color: rgba(255,255,255,.8);
+  border-radius: 3px;
+  margin: 7px 0 0 -20px;
+  line-height: 1.2;
+  padding: 3px;
+}

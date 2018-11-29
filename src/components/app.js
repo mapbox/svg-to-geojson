@@ -40,13 +40,6 @@ let App = class App extends React.PureComponent {
       zoom: 1.5
     });
 
-    let mapp = this.map;
-
-    mapp.on('click', function(e){
-      var features = mapp.queryRenderedFeatures(e.point);
-      console.log(features);
-    });
-
     this.draw = new MapboxDraw();
 
     this.map.on('load', () => {
@@ -64,45 +57,20 @@ let App = class App extends React.PureComponent {
     saveAs(blob, 'features.geojson');
   };
 
+  updateHandle = val => {
+    document.querySelector(".number").innerHTML = val;
+  }
+
   sendValue = val => {
+    this.draw.deleteAll();
     NUM_POINTS = val;
-    console.log('test', NUM_POINTS)
     if(currentFile){
-      const tMap = this.map;
-      let currentLayers = [];
-      tMap.getStyle().layers.forEach(item => {
-        if(item.id.match(/gl-draw/g)){
-          if(currentLayers.indexOf(item.id) < 0){
-            currentLayers.push(item.id);
-            console.log(item.source);
-          }
-        }
-      });
-      currentLayers.forEach(id => {
-        tMap.removeLayer(id);
-      })
-      tMap.removeSource('mapbox-gl-draw-cold');
-      tMap.removeSource('mapbox-gl-draw-hot');
       const reader = new FileReader();
       reader.addEventListener('load', d => {
-
         svgo.postMessage({
           svg: d.target.result
         });
-
-        svgo.addEventListener('message', e => {
-          pathologize(e.data)
-            .then(this.svgToGeoJSON)
-            .catch(err => {
-              console.error(err);
-              this.setState({
-                helpText: 'Error parsing SVG. Try increasing number of points.'
-              });
-              return;
-            });
-        });
       });
-
       reader.readAsText(currentFile);
     }
   }
@@ -325,9 +293,10 @@ let App = class App extends React.PureComponent {
 
     return connectDropTarget(
       <div>
-        <ReactSlider defaultValue={250} min={250} max={5000} onAfterChange={this.sendValue.bind(this)} withBars>
-          <div className="my-handle">😎</div>
-        </ReactSlider>
+        <div className="sliderHolder">
+          <ReactSlider orientation={'vertical'} invert={true} defaultValue={300} min={250} max={5000} onChange={this.updateHandle.bind(this)} onAfterChange={this.sendValue.bind(this)} />
+          <div className="pointHolder"><div className="number">250</div>points</div>
+        </div>
         <div onMouseMove={this.trackCoordinates}>
           <div className="flex-parent flex-parent--end-cross flex-parent--center-main absolute top right bottom left">
             <div className="flex-child mb24 z1 txt-s txt-bold flex-parent">
