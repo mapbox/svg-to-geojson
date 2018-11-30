@@ -294,7 +294,7 @@ let App = class App extends React.PureComponent {
     return connectDropTarget(
       <div>
         <div className="sliderHolder">
-          <ReactSlider orientation={'vertical'} invert={true} defaultValue={300} min={250} max={5000} onChange={this.updateHandle.bind(this)} onAfterChange={this.sendValue.bind(this)} />
+          <ReactSlider orientation={'vertical'} invert={true} defaultValue={300} min={250} max={5000} onChange={this.updateHandle} onAfterChange={this.sendValue} />
           <div className="pointHolder"><div className="number">250</div>points</div>
         </div>
         <div onMouseMove={this.trackCoordinates}>
