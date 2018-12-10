@@ -1,5 +1,6 @@
 import 'mapbox-gl/dist/mapbox-gl.css';
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
+import './app.css';
 import React from 'react';
 import HTML5Backend from 'react-dnd-html5-backend';
 import SVGO from 'worker-loader!../web-workers/svgo.js';
@@ -10,12 +11,15 @@ import MapboxDraw from '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw';
 import { pathologize } from '../pathologize';
 import { pathToCoords } from '../path-to-coordinates';
 import { saveAs } from 'filesaver.js';
+import ReactSlider from 'react-slider';
 
+const turf = require('@turf/turf');
 const svgo = new SVGO();
 mapboxgl.accessToken = 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4M29iazA2Z2gycXA4N2pmbDZmangifQ.-g_vE53SD2WrJ6tFX7QHmA';
 
 const SCALE = 1;
-const NUM_POINTS = 250;
+let NUM_POINTS = 250,
+    currentFile;
 
 let App = class App extends React.PureComponent {
   mouseCoordinates = {
@@ -58,6 +62,24 @@ let App = class App extends React.PureComponent {
     saveAs(blob, 'features.geojson');
   };
 
+  updateHandle = val => {
+    document.querySelector(".number").innerHTML = val;
+  }
+
+  sendValue = val => {
+    this.draw.deleteAll();
+    NUM_POINTS = val;
+    if(currentFile){
+      const reader = new FileReader();
+      reader.addEventListener('load', d => {
+        svgo.postMessage({
+          svg: d.target.result
+        });
+      });
+      reader.readAsText(currentFile);
+    }
+  }
+
   trackCoordinates = e => {
     this.mouseCoordinates = {
       x: e.screenX,
@@ -70,15 +92,20 @@ let App = class App extends React.PureComponent {
   };
 
   buildFeature = data => {
-    const {id, coords} = data;
+    const {path, coords} = data;
+
     let feature = {
       type: 'Feature',
       properties: {},
       geometry: {}
     }
 
-    if (id) {
-      feature.properties.id = id;
+    if (path.id) {
+      feature.properties.id = path.id;
+    }
+
+    if (path.getAttribute("fill")) {
+      feature.properties.fill = path.getAttribute("fill");
     }
 
     // If the first and last coords match it should be drawn as a polygon
@@ -94,13 +121,77 @@ let App = class App extends React.PureComponent {
             ]
           };
     } else {
-      feature.geometry = {
-        type: 'LineString',
-        coordinates: coords.map(d => {
-          const c = this.map.unproject(d);
-          return [c.lng, c.lat];
-        })
-      };
+      const getSum = (total, num) => {
+          return total + num;
+      }
+      try {
+        // try to see if it should be a multipolygon
+        let distances = [];
+        let splits = [];
+        coords.forEach((c, idx) => {
+          if(idx > 0){
+            const from = turf.point([this.map.unproject(coords[idx - 1])['lng'], this.map.unproject(coords[idx - 1])['lat']]);
+            const to = turf.point([this.map.unproject(c)['lng'], this.map.unproject(c)['lat']]);
+            const options = {units: 'miles'};
+
+            const distance = turf.distance(from, to, options);
+            // get distances between points
+            distances.push(distance);
+          }
+        });
+
+        const distAvg = distances.reduce(getSum)/distances.length;
+        coords.forEach((c, idx) => {
+          if(idx > 0){
+            const from = turf.point([this.map.unproject(coords[idx - 1])['lng'], this.map.unproject(coords[idx - 1])['lat']]);
+            const to = turf.point([this.map.unproject(c)['lng'], this.map.unproject(c)['lat']]);
+            const options = {units: 'miles'};
+            const distance = turf.distance(from, to, options);
+            // if the following coordinate is ~2.5 farther away than average, it is most likely a new polygon
+            if(distance > distAvg*2.5){
+              splits.push(idx);
+            }
+          }
+        });
+
+        // idx only gets to last split - needs to get to the end of the shape
+        splits.push(NUM_POINTS);
+
+        let newShapeArray = [];
+        splits.forEach((s, idx) => {
+          let shape = [];
+          if(idx === 0){
+            for(let i = 0; i < s; i++){
+              shape.push([this.map.unproject(coords[i])['lng'], this.map.unproject(coords[i])['lat']]);
+            }
+          } else {
+            for(let i = splits[idx-1]; i < s; i++){
+              shape.push([this.map.unproject(coords[i])['lng'], this.map.unproject(coords[i])['lat']]);
+            }
+          }
+          newShapeArray.push([shape]);
+        });
+
+        newShapeArray.forEach(shape => {
+          shape[0].push(shape[0][0]);
+        });
+
+        feature.geometry = {
+          type: 'MultiPolygon',
+          coordinates: newShapeArray
+        };
+      }
+      catch(err) {
+        feature.geometry = {
+          type: 'LineString',
+          coordinates: coords.map(d => {
+            const c = this.map.unproject(d);
+            return [c.lng, c.lat];
+          })
+        };
+      }
+
+
     }
 
     return feature;
@@ -162,6 +253,7 @@ let App = class App extends React.PureComponent {
 
   onUpload = files => {
     const file = files[0];
+    currentFile = file;
     const { type } = file;
 
     this.setState({
@@ -205,17 +297,23 @@ let App = class App extends React.PureComponent {
     const { connectDropTarget, isOver } = this.props;
 
     return connectDropTarget(
-      <div onMouseMove={this.trackCoordinates}>
-        <div className="flex-parent flex-parent--end-cross flex-parent--center-main absolute top right bottom left">
-          <div className="flex-child mb24 z1 txt-s txt-bold flex-parent">
-            <div className="flex-child bg-darken75 color-white inline-block pl24 pr12 py12 round-l-full">
-              {helpText}
-            </div>
-            <button className="flex-child btn btn--purple px24 round-r-full" onClick={this.download}>
-              Download
-            </button>
-          </div>
+      <div>
+        <div className="sliderHolder">
+          <ReactSlider orientation={'vertical'} invert={true} defaultValue={300} min={250} max={5000} onChange={this.updateHandle} onAfterChange={this.sendValue} />
+          <div className="pointHolder"><div className="number">250</div>points</div>
         </div>
+        <div onMouseMove={this.trackCoordinates}>
+          <div className="flex-parent flex-parent--end-cross flex-parent--center-main absolute top right bottom left">
+            <div className="flex-child mb24 z1 txt-s txt-bold flex-parent">
+              <div className="flex-child bg-darken75 color-white inline-block pl24 pr12 py12 round-l-full">
+                {helpText}
+              </div>
+              <button className="flex-child btn btn--purple px24 round-r-full" onClick={this.download}>
+                Download
+              </button>
+            </div>
+          </div>
+      </div>
 
         {isOver && <div className="bg-darken25 fixed left right top bottom events-none z5" />}
         <div ref={this.setMapContainer} className="absolute top right left bottom" />
