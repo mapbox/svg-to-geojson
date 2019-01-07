@@ -7,6 +7,7 @@ module.exports = `
     <meta charSet="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>SVG to GeoJSON</title>
+    <link rel="canonical" href="https://labs.mapbox.com/svg-to-geojson/" >
     <link rel="stylesheet" href="https://api.mapbox.com/mapbox-assembly/mbx/v0.20.2/assembly.min.css">
     <script src="https://api.mapbox.com/mapbox-assembly/mbx/v0.20.2/assembly.js"></script>
   </head>
