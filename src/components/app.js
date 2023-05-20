@@ -15,7 +15,7 @@ import ReactSlider from 'react-slider';
 
 const turf = require('@turf/turf');
 const svgo = new SVGO();
-mapboxgl.accessToken = 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4M29iazA2Z2gycXA4N2pmbDZmangifQ.-g_vE53SD2WrJ6tFX7QHmA';
+mapboxgl.accessToken = 'pk.eyJ1IjoibGFicy1zYW5kYm94IiwiYSI6ImNrMTZuanRmZDA2eGQzYmxqZTlnd21qY3EifQ.Q7DM5HqE5QJzDEnCx8BGFw';
 
 const SCALE = 1;
 let NUM_POINTS = 250,

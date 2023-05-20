@@ -23,9 +23,9 @@
     "worker-loader": "^2.0.0"
   },
   "scripts": {
-    "start": "underreact start",
-    "build": "underreact build",
-    "serve-static": "underreact serve-static"
+    "start": "NODE_OPTIONS=--openssl-legacy-provider underreact start",
+    "build": "NODE_OPTIONS=--openssl-legacy-provider underreact build",
+    "serve-static": "NODE_OPTIONS=--openssl-legacy-provider underreact serve-static"
   },
   "author": "Mapbox",
   "license": "ISC",
